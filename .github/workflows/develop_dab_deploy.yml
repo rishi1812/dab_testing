@@ -59,7 +59,7 @@ jobs:
 
       - name: Set DAB config based on branch
         run: |
-          if [[ "${{ github.base_ref }}" == "develop" ]]; then
+          if [[ "${{ github.ref_name}}" == "develop" ]]; then
             echo "copied databricks.yml to 'develop' branch root dir"
             cp ${{ env.ENV_BUNDLE_DIR }}/develop/databricks.yml .
           else

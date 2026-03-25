@@ -1,0 +1,77 @@
+# # Declarative Automation Bundle configuration, more info here: https://docs.databricks.com/en/dev-tools/bundles/settings.html
+# bundle:
+#   name: "dab_testing"
+
+# include:
+#   - resources/*.yml
+#   - resources/*/*.yml
+
+# targets:
+#   # The 'dev' target, for development purposes. This target is the default.
+#   dev:
+#     mode: production
+#     default: true
+#     workspace:
+#       host: https://dbc-4d2d53ff-7597.cloud.databricks.com
+#       root_path: /Workspace/dab_testing
+#   # The 'prod' target, used for production deployment.
+#   prod:
+#     mode: production
+#     workspace:
+#       host: https://dbc-4d2d53ff-7597.cloud.databricks.com
+#       # We always use /Users/anandrishi3112@gmail.com for all resources to make sure we only have a single copy.
+#       root_path: /Users/anandrishi3112@gmail.com/.bundle/${bundle.name}/${bundle.target}
+#     run_as:
+#       # This runs as anandrishi3112@gmail.com in production. We could also use a service principal here,
+#       # see https://docs.databricks.com/dev-tools/bundles/permissions.html.
+#       user_name: anandrishi3112@gmail.com
+bundle:
+  name: prod_bundle_dabs
+
+include:
+  - workflow_jobs/develop/resources/*.yml
+
+# permissions:
+#       - level: CAN_VIEW
+#         group_name: DataOps_Support_Team
+#       - level: CAN_VIEW
+#         group_name: FDP_Data_Governance_Team
+#       - level: CAN_VIEW
+#         service_principal_name: 718b7a74-438e-4fdf-8f52-dcb574b0e8c9
+#       - level: CAN_MANAGE
+#         group_name: Ratings_Development_Team
+#       - level: CAN_MANAGE
+#         service_principal_name: 1c40967b-86e1-4f86-af09-c69cc7e339da
+#         #AI access
+#       - level: CAN_VIEW
+#         service_principal_name: 46f9e9c0-31bd-4cbf-9195-9624e61045fb
+
+
+# variables:
+#   instance_profile_arn:
+#     description: Instance profile arn as attribute in job
+#     default: arn:aws:iam::742939588079:instance-profile/fng-dmo-prod-databricks-instance-role
+#   env:
+#     description: Databricks workspace we're running in
+#     default: dev
+#   aws_profile:
+#     description: AWS profile tied to IAM role for a particular AWS account
+#     default: fox-fdp-bi-nonprod
+#   bundle_env:
+#     description: Databricks workspace environment
+#     default: develop
+#   job_compute_policy_id:
+#     description: Job compute policy ID to enforce on all job clusters
+#     default: "001FBA19A8F32588"
+
+
+targets:
+  prod_bundle:
+    workspace:
+      host: "https://dbc-4d2d53ff-7597.cloud.databricks.com/"
+      root_path: /Workspace/dab_testing/.bundle/${bundle.target}/${bundle.name}
+    # variables:
+    #   env: dev
+    #   aws_profile: fox-fdp-bi-nonprod
+    #   bundle_env: develop
+

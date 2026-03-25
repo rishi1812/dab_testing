@@ -1,0 +1,27 @@
+# Declarative Automation Bundle configuration, more info here: https://docs.databricks.com/en/dev-tools/bundles/settings.html
+bundle:
+  name: "dab_testing"
+
+include:
+  - resources/*.yml
+  - resources/*/*.yml
+
+targets:
+  # The 'dev' target, for development purposes. This target is the default.
+  dev:
+    mode: production
+    default: true
+    workspace:
+      host: https://dbc-4d2d53ff-7597.cloud.databricks.com
+      root_path: /Workspace/dab_testing
+  # The 'prod' target, used for production deployment.
+  prod:
+    mode: production
+    workspace:
+      host: https://dbc-4d2d53ff-7597.cloud.databricks.com
+      # We always use /Users/anandrishi3112@gmail.com for all resources to make sure we only have a single copy.
+      root_path: /Users/anandrishi3112@gmail.com/.bundle/${bundle.name}/${bundle.target}
+    run_as:
+      # This runs as anandrishi3112@gmail.com in production. We could also use a service principal here,
+      # see https://docs.databricks.com/dev-tools/bundles/permissions.html.
+      user_name: anandrishi3112@gmail.com

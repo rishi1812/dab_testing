@@ -1,10 +1,10 @@
-name: 'Databricks Bundle deployment in UAT'
+name: 'Databricks Bundle deployment in Prod'
 
 on:
   #pull_request:
   push:
     branches:
-      - uat
+      - prod
     paths-ignore:
       - '**.md'
       - '.gitignore'
@@ -15,21 +15,21 @@ on:
 #   cancel-in-progress: false
 
 env:
-  DATABRICKS_HOST: https://dbc-4d2d53ff-7597.cloud.databricks.com/
-  DATABRICKS_TOKEN: dapi64c36d343115c3a3d31f023568b30a15
+  DATABRICKS_HOST: https://dbc-4b58157d-c7bb.cloud.databricks.com
+  DATABRICKS_TOKEN: 
   # DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
   # DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
-  DATABRICKS_BUNDLE_ENV: uat_bundle
+  DATABRICKS_BUNDLE_ENV: prod_bundle
   ENV_BUNDLE_DIR: env_bundle_files
-  ENVIRONMENT: uat
+  ENVIRONMENT: prod
   # TF_VAR_job_compute_policy_default: ratings_cicd_job_compute_policy_dev
   # TF_VAR_enforce_job_compute_policies: "true"
 
 jobs:
   develop_deploy:
-    name: Validate and Deploy Databricks Bundle UAT
+    name: Validate and Deploy Databricks Bundle PROD
     runs-on: ubuntu-latest
-    environment: uat
+    environment: prod
     defaults:
       run:
         working-directory: .
@@ -61,9 +61,9 @@ jobs:
 
       - name: Set DAB config based on branch
         run: |
-          if [[ "${{ github.ref_name}}" == "uat" ]]; then
-            echo "copied databricks.yml to 'uat' branch root dir"
-            cp ${{ env.ENV_BUNDLE_DIR }}/uat/databricks.yml .
+          if [[ "${{ github.ref_name}}" == "prod" ]]; then
+            echo "copied databricks.yml to 'prod' branch root dir"
+            cp ${{ env.ENV_BUNDLE_DIR }}/prod/databricks.yml .
           else
             echo "❌ No matching target branch"
           fi

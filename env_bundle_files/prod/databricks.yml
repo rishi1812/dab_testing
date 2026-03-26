@@ -68,7 +68,7 @@ include:
 targets:
   prod_bundle:
     workspace:
-      host: "https://dbc-4d2d53ff-7597.cloud.databricks.com/"
+      host: "https://dbc-4b58157d-c7bb.cloud.databricks.com"
       root_path: /Workspace/dab_testing/.bundle/${bundle.target}/${bundle.name}
     # variables:
     #   env: dev

@@ -15,6 +15,8 @@ on:
 #   cancel-in-progress: false
 
 env:
+  DATABRICKS_HOST: https://dbc-4d2d53ff-7597.cloud.databricks.com/
+  DATABRICKS_TOKEN: dapi64c36d343115c3a3d31f023568b30a15
   # DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
   # DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
   DATABRICKS_BUNDLE_ENV: develop_bundle

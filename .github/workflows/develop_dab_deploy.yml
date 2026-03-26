@@ -79,7 +79,10 @@ jobs:
       #       "^workflow_jobs/develop/resources/.*\.yml$" \
       #       "develop_bundle" \
       #       "$GITHUB_ENV"
-
+      - name: Install Databricks CLI
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+    
       - name: Validate Databricks Bundle
         run: |
           databricks bundle validate -t ${{ env.DATABRICKS_BUNDLE_ENV }}

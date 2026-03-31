@@ -31,7 +31,7 @@ jobs:
         working-directory: .
     steps:
       - name: Check source branch for uat
-        if: github.base_ref == 'uat' && github.head_ref != 'develop'
+        if: github.ref_name == 'uat' && github.head_ref != 'develop'
         run: |
           echo "PRs can only be made from 'develop' branch to 'uat'."
           exit 1

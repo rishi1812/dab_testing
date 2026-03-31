@@ -1,0 +1,35 @@
+name: Restrict UAT Branch Updates
+
+on:
+  pull_request:
+    branches:
+      - uat
+  push:
+    branches:
+      - uat
+
+jobs:
+  check-source-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate source branch
+        run: |
+          echo "Base branch: ${{ github.ref }}"
+          echo "Source branch: ${{ github.head_ref }}"
+
+          # Case 1: Pull Request
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            if [[ "${{ github.head_ref }}" != "dev" ]]; then
+              echo "❌ Only 'dev' branch can merge into 'uat'"
+              exit 1
+            fi
+          fi
+
+          # Case 2: Direct Push (block it completely)
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            echo "❌ Direct push to 'uat' is not allowed"
+            exit 1
+          fi
+
+          echo "✅ Validation passed"

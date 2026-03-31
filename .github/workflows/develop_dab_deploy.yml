@@ -15,7 +15,8 @@ on:
 #   cancel-in-progress: false
 
 env:
-  DATABRICKS_HOST: https://dbc-4d2d53ff-7597.cloud.databricks.com/
+  #DATABRICKS_HOST: https://dbc-4d2d53ff-7597.cloud.databricks.com/
+  DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
   #DATABRICKS_TOKEN: dapi64c36d343115c3a3d31f023568b30a15
   DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
   #DATABRICKS_CLIENT_ID: 558c92b5-f799-40e6-b6e0-354e8f0790e5
@@ -31,7 +32,7 @@ jobs:
   develop_deploy:
     name: Validate and Deploy Databricks Bundle DEV
     runs-on: ubuntu-latest
-    environment: dev1
+    environment: dev
     defaults:
       run:
         working-directory: .

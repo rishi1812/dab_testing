@@ -31,7 +31,7 @@ jobs:
   develop_deploy:
     name: Validate and Deploy Databricks Bundle DEV
     runs-on: ubuntu-latest
-    environment: dev
+    environment: dev1
     defaults:
       run:
         working-directory: .

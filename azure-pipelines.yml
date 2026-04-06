@@ -37,6 +37,15 @@ stages:
           displayName: Install Databricks CLI
 
         - script: |
+            if [ "$(Build.SourceBranchName)" == "develop" ]; then
+              echo "copied databricks.yml to 'develop' branch root dir"
+              cp $(ENV_BUNDLE_DIR)/develop/databricks.yml .
+            else
+              echo "❌ No matching target branch"
+            fi
+          displayName: Set DAB config based on branch
+          
+        - script: |
             databricks bundle validate -t $(DATABRICKS_BUNDLE_ENV)
           displayName: Validate Databricks Bundle
 

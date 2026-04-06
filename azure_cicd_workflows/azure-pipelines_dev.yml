@@ -1,0 +1,63 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- develop
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: Deploy
+    displayName: Deploy to Databricks
+    jobs:
+      - job: DeployBundle
+        displayName: Deploy Databricks Asset Bundle
+        
+        steps:
+        - script: echo Hello, world!
+          displayName: 'Run a one-line script'
+
+        - script: |
+            echo Add other tasks to build, test, and deploy your project.
+            echo See https://aka.ms/yaml
+          displayName: 'Run a multi-line script' 
+
+        - checkout: self
+          fetchDepth: 0
+          displayName: Checkout repository (full history)
+
+
+          # Install Databricks CLI
+        - script: |
+            curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+            databricks version
+          displayName: Install Databricks CLI
+
+        - script: |
+            if [ "$(Build.SourceBranchName)" == "develop" ]; then
+              echo "copied databricks.yml to 'develop' branch root dir"
+              cp env_bundle_files/develop/databricks.yml .
+            else
+              echo "❌ No matching target branch"
+            fi
+          displayName: Set DAB config based on branch
+
+        - script: |
+            databricks bundle validate -t $(DATABRICKS_BUNDLE_ENV)
+          displayName: Validate Databricks Bundle
+          env:
+            DATABRICKS_HOST: https://dbc-4d2d53ff-7597.cloud.databricks.com/
+            DATABRICKS_TOKEN: dapi64c36d343115c3a3d31f023568b30a15
+            # ARM_CLIENT_ID: $(DATABRICKS_CLIENT_ID)
+            # ARM_CLIENT_SECRET: $(DATABRICKS_CLIENT_SECRET)
+            # ARM_TENANT_ID: $(AZURE_TENANT_ID)
+
+        - script: |
+            databricks bundle deploy -t $(DATABRICKS_BUNDLE_ENV) --auto-approve --force-lock
+          displayName: Apply Databricks Bundle
+          env:
+            DATABRICKS_HOST: https://dbc-4d2d53ff-7597.cloud.databricks.com/
+            DATABRICKS_TOKEN: dapi64c36d343115c3a3d31f023568b30a15

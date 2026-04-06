@@ -49,7 +49,7 @@ stages:
             databricks bundle validate -t $(DATABRICKS_BUNDLE_ENV)
           displayName: Validate Databricks Bundle
           env:
-            DATABRICKS_HOST: $(DATABRICKS_HOST)
+            DATABRICKS_HOST: https://dbc-4d2d53ff-7597.cloud.databricks.com/
             DATABRICKS_TOKEN: dapi64c36d343115c3a3d31f023568b30a15
             # ARM_CLIENT_ID: $(DATABRICKS_CLIENT_ID)
             # ARM_CLIENT_SECRET: $(DATABRICKS_CLIENT_SECRET)

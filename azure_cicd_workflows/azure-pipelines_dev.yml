@@ -4,14 +4,16 @@
 # https://aka.ms/yaml
 
 trigger:
-- develop
-
+  branches:
+    include:
+      - develop
+pr: none
 pool:
   vmImage: ubuntu-latest
 
 stages:
   - stage: Deploy
-    displayName: Deploy to DEV Databricks
+    displayName: Deploy to DEV  Databricks
     jobs:
       - job: DeployBundle
         displayName: Deploy Databricks Asset Bundle

@@ -58,3 +58,6 @@ stages:
         - script: |
             databricks bundle deploy -t $(DATABRICKS_BUNDLE_ENV) --auto-approve --force-lock
           displayName: Apply Databricks Bundle
+          env:
+            DATABRICKS_HOST: https://dbc-4d2d53ff-7597.cloud.databricks.com/
+            DATABRICKS_TOKEN: dapi64c36d343115c3a3d31f023568b30a15

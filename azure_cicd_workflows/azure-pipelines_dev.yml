@@ -65,4 +65,11 @@ stages:
           displayName: Apply Databricks Bundle
           env:
             DATABRICKS_HOST: https://dbc-4d2d53ff-7597.cloud.databricks.com/
-            DATABRICKS_TOKEN: dapi64c36d343115c3a3d31f023568b30a15
+            #DATABRICKS_TOKEN: dapi64c36d343115c3a3d31f023568b30a15
+            # ARM_CLIENT_ID: $(DATABRICKS_CLIENT_ID)
+            # ARM_CLIENT_SECRET: $(DATABRICKS_CLIENT_SECRET)
+            # ARM_TENANT_ID: $(AZURE_TENANT_ID)
+            #DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+            DATABRICKS_CLIENT_ID: 558c92b5-f799-40e6-b6e0-354e8f0790e5
+            #DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+            DATABRICKS_CLIENT_SECRET: doseb449b207c8eb4099acd092d0439c7166

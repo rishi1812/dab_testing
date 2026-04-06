@@ -4,7 +4,9 @@
 # https://aka.ms/yaml
 
 trigger:
-- uat
+  branches:
+    include:
+      - uat
 
 pool:
   vmImage: ubuntu-latest

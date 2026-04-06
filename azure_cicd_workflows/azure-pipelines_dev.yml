@@ -3,9 +3,10 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-push:
+on:
+  #pull_request:
   push:
-    include:
+    branches:
       - develop
 pool:
   vmImage: ubuntu-latest

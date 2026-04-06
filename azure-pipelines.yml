@@ -15,6 +15,7 @@ stages:
     jobs:
       - job: DeployBundle
         displayName: Deploy Databricks Asset Bundle
+        
         steps:
         - script: echo Hello, world!
           displayName: 'Run a one-line script'
@@ -23,3 +24,9 @@ stages:
             echo Add other tasks to build, test, and deploy your project.
             echo See https://aka.ms/yaml
           displayName: 'Run a multi-line script' 
+
+          # Install Databricks CLI
+        - script: |
+            curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+            databricks version
+          displayName: Install Databricks CLI

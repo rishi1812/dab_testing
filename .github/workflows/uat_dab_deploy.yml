@@ -1,10 +1,10 @@
-name: 'Databricks Bundle deployment in Develop'
+name: 'Databricks Bundle deployment in UAT'
 
 on:
   #pull_request:
   push:
     branches:
-      - develop
+      - uat
     paths-ignore:
       - '**.md'
       - '.gitignore'
@@ -15,19 +15,17 @@ on:
 #   cancel-in-progress: false
 
 env:
-  # DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
-  # DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
-  DATABRICKS_BUNDLE_ENV: develop_bundle
+  DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
+  DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+  DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+  DATABRICKS_BUNDLE_ENV: uat_bundle
   ENV_BUNDLE_DIR: env_bundle_files
-  ENVIRONMENT: develop
-  # TF_VAR_job_compute_policy_default: ratings_cicd_job_compute_policy_dev
-  # TF_VAR_enforce_job_compute_policies: "true"
-
+  ENVIRONMENT: uat
 jobs:
   develop_deploy:
-    name: Validate and Deploy Databricks Bundle DEV
+    name: Validate and Deploy Databricks Bundle UAT
     runs-on: ubuntu-latest
-    environment: dev
+    environment: uat
     defaults:
       run:
         working-directory: .
@@ -59,9 +57,9 @@ jobs:
 
       - name: Set DAB config based on branch
         run: |
-          if [[ "${{ github.base_ref }}" == "develop" ]]; then
-            echo "copied databricks.yml to 'develop' branch root dir"
-            cp ${{ env.ENV_BUNDLE_DIR }}/develop/databricks.yml .
+          if [[ "${{ github.ref_name}}" == "uat" ]]; then
+            echo "copied databricks.yml to 'uat' branch root dir"
+            cp ${{ env.ENV_BUNDLE_DIR }}/uat/databricks.yml .
           else
             echo "❌ No matching target branch"
           fi
@@ -79,7 +77,10 @@ jobs:
       #       "^workflow_jobs/develop/resources/.*\.yml$" \
       #       "develop_bundle" \
       #       "$GITHUB_ENV"
-
+      - name: Install Databricks CLI
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+    
       - name: Validate Databricks Bundle
         run: |
           databricks bundle validate -t ${{ env.DATABRICKS_BUNDLE_ENV }}

@@ -1,0 +1,97 @@
+name: 'Databricks Bundle deployment in Develop'
+
+on:
+  #pull_request:
+  push:
+    branches:
+      - develop
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+
+
+# concurrency:
+#   group: terraform-${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
+#   cancel-in-progress: false
+
+env:
+  #DATABRICKS_HOST: https://dbc-4d2d53ff-7597.cloud.databricks.com/
+  DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
+  #DATABRICKS_TOKEN: dapi64c36d343115c3a3d31f023568b30a15
+  DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+  #DATABRICKS_CLIENT_ID: 558c92b5-f799-40e6-b6e0-354e8f0790e5
+  DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+  #DATABRICKS_CLIENT_SECRET: doseb449b207c8eb4099acd092d0439c7166
+  DATABRICKS_BUNDLE_ENV: develop_bundle
+  ENV_BUNDLE_DIR: env_bundle_files
+  ENVIRONMENT: develop
+  # TF_VAR_job_compute_policy_default: ratings_cicd_job_compute_policy_dev
+  # TF_VAR_enforce_job_compute_policies: "true"
+
+jobs:
+  develop_deploy:
+    name: Validate and Deploy Databricks Bundle DEV
+    runs-on: ubuntu-latest
+    environment: dev
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch full history to enable diff against base branch
+    
+      # - name: Add default Cluster and Job tags
+      #   continue-on-error: true
+      #   run: |
+      #     source /venv/bin/activate
+      #     if python3 scripts/add_dab_cluster_and_job_tags.py ${{ env.ENVIRONMENT }}; then
+      #       echo "✅ Script executed successfully in environment -> ${{ env.ENVIRONMENT }} ."
+      #     else
+      #       echo "⚠️ Script failed, but continuing the workflow."
+      #     fi  
+
+      # - name: Add selective permissions for jobs
+      #   continue-on-error: true
+      #   run: |
+      #     source /venv/bin/activate
+      #     if python3 scripts/add_selective_permissions_for_jobs.py ${{ env.ENVIRONMENT }}; then
+      #       echo "✅ Script executed successfully in environment -> ${{ env.ENVIRONMENT }} ."
+      #     else
+      #       echo "⚠️ Script failed, but continuing the workflow."
+      #     fi 
+
+      - name: Set DAB config based on branch
+        run: |
+          if [[ "${{ github.ref_name}}" == "develop" ]]; then
+            echo "copied databricks.yml to 'develop' branch root dir"
+            cp ${{ env.ENV_BUNDLE_DIR }}/develop/databricks.yml .
+          else
+            echo "❌ No matching target branch"
+          fi
+
+      - name: Fetch base branch for diff
+        run: |
+          git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }} || true
+
+      # - name: Resolve policy ID, validate node_type_id, and enforce policy_id
+      #   run: |
+      #     bash scripts/validate_and_enforce_policy_id.sh \
+      #       "origin/${{ github.base_ref }}" \
+      #       "HEAD" \
+      #       "${{ env.TF_VAR_job_compute_policy_default }}" \
+      #       "^workflow_jobs/develop/resources/.*\.yml$" \
+      #       "develop_bundle" \
+      #       "$GITHUB_ENV"
+      - name: Install Databricks CLI
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+    
+      - name: Validate Databricks Bundle
+        run: |
+          databricks bundle validate -t ${{ env.DATABRICKS_BUNDLE_ENV }}
+          
+      - name: Apply Databricks Bundle
+        run: |
+          databricks bundle deploy -t ${{ env.DATABRICKS_BUNDLE_ENV }} --auto-approve --force-lock

@@ -1,0 +1,22 @@
+name: Restrict PR Source Branch
+
+on:
+  pull_request:
+    branches:
+    - uat
+    - main
+
+jobs:
+  check-PR-source-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check source branch for uat
+        if: github.base_ref == 'uat' && github.head_ref != 'develop'
+        run: |
+          echo "PRs can only be made from 'develop' branch to 'uat'."
+          exit 1
+      - name: Check source branch for main
+        if: github.base_ref == 'main' && (github.head_ref != 'uat' && !startsWith(github.head_ref, 'hotfix/') && !startsWith(github.head_ref, 'release/'))
+        run: |
+          echo "PRs to 'main' must come from 'uat', 'hotfix/*', or 'release/*' branches."
+          exit 1

@@ -35,3 +35,11 @@ stages:
             curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
             databricks version
           displayName: Install Databricks CLI
+
+        - script: |
+            databricks bundle validate -t $(DATABRICKS_BUNDLE_ENV)
+          displayName: Validate Databricks Bundle
+
+        - script: |
+            databricks bundle deploy -t $(DATABRICKS_BUNDLE_ENV) --auto-approve --force-lock
+          displayName: Apply Databricks Bundle

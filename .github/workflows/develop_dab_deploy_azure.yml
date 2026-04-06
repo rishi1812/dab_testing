@@ -1,96 +1,56 @@
-# Azure DevOps Pipeline — Databricks Bundle Deployment (Develop)
-# Equivalent of GitHub Actions: .github/workflows/deploy-dev.yml
-
 trigger:
   branches:
     include:
-      - develop
-  paths:
-    exclude:
-      - '**.md'
-      - '.gitignore'
+      - main
 
-pr: none  # Commented out in original: equivalent of the commented-out pull_request trigger
+pool:
+  vmImage: 'ubuntu-latest'
 
-# ── Variable Groups ──────────────────────────────────────────────────────────
-# Create these in Azure DevOps → Pipelines → Library:
-#   Variable Group: "databricks-dev-vars"   → DATABRICKS_HOST (plain var)
-#   Variable Group: "databricks-dev-secrets"→ DATABRICKS_CLIENT_ID, DATABRICKS_CLIENT_SECRET (secret vars)
 variables:
-  - group: databricks-dev-vars      # contains: DATABRICKS_HOST
-  - group: databricks-dev-secrets   # contains: DATABRICKS_CLIENT_ID, DATABRICKS_CLIENT_SECRET
-  - name: DATABRICKS_BUNDLE_ENV
-    value: develop_bundle
-  - name: ENV_BUNDLE_DIR
-    value: env_bundle_files
-  - name: ENVIRONMENT
-    value: develop
+  - group: databricks-secrets
 
-# ── Stage & Job ──────────────────────────────────────────────────────────────
 stages:
-  - stage: develop_deploy
-    displayName: Validate and Deploy Databricks Bundle DEV
+  - stage: Deploy
+    displayName: Deploy to Databricks
     jobs:
-      - deployment: deploy_to_dev
-        displayName: Deploy to Databricks DEV
-        environment: dev           # matches 'environment: dev' in GitHub Actions
-        pool:
-          vmImage: ubuntu-latest   # equivalent of runs-on: ubuntu-latest
-        strategy:
-          runOnce:
-            deploy:
-              steps:
+      - job: DeployBundle
+        displayName: Deploy Databricks Asset Bundle
+        steps:
 
-                # ── Step 1: Checkout ─────────────────────────────────────────
-                - checkout: self
-                  displayName: Checkout repository
-                  fetchDepth: 0    # Fetch full history (equivalent of fetch-depth: 0)
+          # Checkout code
+          - checkout: self
 
-                # ── Step 2: Set DAB config based on branch ───────────────────
-                - script: |
-                    if [[ "$(Build.SourceBranchName)" == "develop" ]]; then
-                      echo "Copied databricks.yml to 'develop' branch root dir"
-                      cp $(ENV_BUNDLE_DIR)/develop/databricks.yml .
-                    else
-                      echo "❌ No matching target branch"
-                    fi
-                  displayName: Set DAB config based on branch
+          # Install Databricks CLI
+          - script: |
+              curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+              databricks version
+            displayName: Install Databricks CLI
 
-                # ── Step 3: Fetch base branch for diff ───────────────────────
-                # Note: In ADO pull_request builds, $(System.PullRequest.TargetBranch)
-                # holds the base branch. On a push trigger this is informational only.
-                - script: |
-                    git fetch origin $(System.PullRequest.TargetBranch):refs/remotes/origin/$(System.PullRequest.TargetBranch) || true
-                  displayName: Fetch base branch for diff
+          # Azure Service Principal Login
+          - script: |
+              echo "Logging into Azure..."
+              az login --service-principal \
+                --username $(AZURE_CLIENT_ID) \
+                --password $(AZURE_CLIENT_SECRET) \
+                --tenant $(AZURE_TENANT_ID)
+            displayName: Azure Login
 
-                # ── Step 4: Install Databricks CLI ───────────────────────────
-                - script: |
-                    curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
-                  displayName: Install Databricks CLI
-                  env:
-                    # Expose secret variables to this step explicitly
-                    # (ADO requires secrets to be mapped into env for scripts)
-                    DATABRICKS_HOST: $(DATABRICKS_HOST)
-                    DATABRICKS_CLIENT_ID: $(DATABRICKS_CLIENT_ID)
-                    DATABRICKS_CLIENT_SECRET: $(DATABRICKS_CLIENT_SECRET)
+          # Configure Databricks authentication (AAD)
+          - script: |
+              mkdir -p ~/.databricks
+              echo "[DEFAULT]" > ~/.databricks/config
+              echo "host = $(DATABRICKS_HOST)" >> ~/.databricks/config
+              echo "azure_client_id = $(AZURE_CLIENT_ID)" >> ~/.databricks/config
+              echo "azure_client_secret = $(AZURE_CLIENT_SECRET)" >> ~/.databricks/config
+              echo "azure_tenant_id = $(AZURE_TENANT_ID)" >> ~/.databricks/config
+            displayName: Configure Databricks CLI (AAD)
 
-                # ── Step 5: Validate Databricks Bundle ───────────────────────
-                - script: |
-                    databricks bundle validate -t $(DATABRICKS_BUNDLE_ENV)
-                  displayName: Validate Databricks Bundle
-                  env:
-                    DATABRICKS_HOST: $(DATABRICKS_HOST)
-                    DATABRICKS_CLIENT_ID: $(DATABRICKS_CLIENT_ID)
-                    DATABRICKS_CLIENT_SECRET: $(DATABRICKS_CLIENT_SECRET)
+          # Validate bundle
+          - script: |
+              databricks bundle validate
+            displayName: Validate Bundle
 
-                # ── Step 6: Deploy Databricks Bundle ─────────────────────────
-                - script: |
-                    databricks bundle deploy \
-                      -t $(DATABRICKS_BUNDLE_ENV) \
-                      --auto-approve \
-                      --force-lock
-                  displayName: Apply Databricks Bundle
-                  env:
-                    DATABRICKS_HOST: $(DATABRICKS_HOST)
-                    DATABRICKS_CLIENT_ID: $(DATABRICKS_CLIENT_ID)
-                    DATABRICKS_CLIENT_SECRET: $(DATABRICKS_CLIENT_SECRET)
+          # Deploy bundle
+          - script: |
+              databricks bundle deploy
+            displayName: Deploy Bundle

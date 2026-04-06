@@ -50,9 +50,10 @@ stages:
           displayName: Validate Databricks Bundle
           env:
             DATABRICKS_HOST: $(DATABRICKS_HOST)
-            ARM_CLIENT_ID: $(DATABRICKS_CLIENT_ID)
-            ARM_CLIENT_SECRET: $(DATABRICKS_CLIENT_SECRET)
-            ARM_TENANT_ID: $(AZURE_TENANT_ID)
+            DATABRICKS_TOKEN: dapi64c36d343115c3a3d31f023568b30a15
+            # ARM_CLIENT_ID: $(DATABRICKS_CLIENT_ID)
+            # ARM_CLIENT_SECRET: $(DATABRICKS_CLIENT_SECRET)
+            # ARM_TENANT_ID: $(AZURE_TENANT_ID)
 
         - script: |
             databricks bundle deploy -t $(DATABRICKS_BUNDLE_ENV) --auto-approve --force-lock

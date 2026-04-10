@@ -29,7 +29,7 @@ stages:
             else
               echo "❌ No matching target branch"
             fi
-          displayName: Set DAB config based on branch
+          displayName: Set DAB config based on branch 
 
         - script: |
             databricks bundle validate -t $(DATABRICKS_BUNDLE_ENV)

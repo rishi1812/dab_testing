@@ -12,10 +12,10 @@ pool:
   vmImage: ubuntu-latest
 
 stages:
-  - stage:  Deploy to DEV  Databricks
+  - stage:  Deploy_to_DEV_Databricks
     displayName: Deploy to DEV  Databricks
     jobs:
-      - job:  Deploy to DEV  Databricks
+      - job:  Deploy_to_DEV_Databricks
         displayName:  Deploy to DEV  Databricks   
         steps:
         - checkout: self

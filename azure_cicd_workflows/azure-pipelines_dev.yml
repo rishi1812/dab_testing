@@ -23,11 +23,6 @@ stages:
           displayName: Checkout repository (full history)
 
         - script: |
-            curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
-            databricks version
-          displayName: Install Databricks CLI
-
-        - script: |
             if [ "$(Build.SourceBranchName)" == "develop" ]; then
               echo "copied databricks.yml to 'develop' branch root dir"
               cp env_bundle_files/develop/databricks.yml .
@@ -41,6 +36,11 @@ stages:
       - job: DeployBundle
         displayName: Deploy Databricks Asset Bundle To Dev   
         steps:
+        - script: |
+            curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+            databricks version
+          displayName: Install Databricks CLI
+          
         - script: |
             databricks bundle validate -t $(DATABRICKS_BUNDLE_ENV)
           displayName: Validate Databricks Bundle

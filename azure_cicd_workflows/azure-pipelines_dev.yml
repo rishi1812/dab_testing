@@ -8,7 +8,7 @@ pool:
 
 stages:
   - stage:  Deploy_to_DEV_Databricks
-    displayName: Deploy to DEV  Databricks 
+    displayName: Deploy to DEV  Databricks  
     jobs:
       - job:  Deploy_to_DEV_Databricks
         displayName:  Deploy to DEV  Databricks   

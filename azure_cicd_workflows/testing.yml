@@ -3,14 +3,16 @@ trigger:
     include:
       - develop
 pr: none
+
 pool:
   vmImage: ubuntu-latest
-- stage: Init
-  displayName: Initialization Stage
-  jobs:
-    - job: DummyJob
-      displayName: Dummy Job
-      steps:
-        - script: |
-            echo "Pipeline started successfully - Build ID: $(Build.BuildNumber)"
-          displayName: Dummy Task
+stages:
+  - stage: Init
+    displayName: Initialization Stage
+    jobs:
+      - job: DummyJob
+        displayName: Dummy Job
+        steps:
+          - script: |
+              echo "Pipeline started successfully - Build ID: $(Build.BuildNumber)"
+            displayName: Dummy Task

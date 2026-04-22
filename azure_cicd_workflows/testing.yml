@@ -18,8 +18,9 @@ stages:
             displayName: Dummy Task
           - script: |
               if [ "$(Build.SourceBranchName)" == "develop" ]; then
-                echo "copied databricks.yml to 'develop' branch root dir"
                 cp env_bundle_files/develop/databricks.yml .
+                echo "copied databricks.yml to 'develop' branch root dir"
+                
               else
                 echo "❌ No matching target branch"
               fi

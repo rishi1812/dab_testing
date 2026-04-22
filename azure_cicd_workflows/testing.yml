@@ -6,22 +6,23 @@ pr: none
 
 pool:
   vmImage: ubuntu-latest
-stages:
-  - stage: Init
-    displayName: Initialization Stage
-    jobs:
-      - job: DummyJob
-        displayName: Dummy Job
-        steps:
-          - script: |
-              echo "Pipeline started successfully - Build ID: $(Build.BuildNumber)"
-            displayName: Dummy Task
-          - script: |
-              if [ "$(Build.SourceBranchName)" == "develop" ]; then
-                cp env_bundle_files/develop/databricks.yml .
-                echo "copied databricks.yml to 'develop' branch root dir"
-                
-              else
-                echo "❌ No matching target branch"
-              fi
-            displayName: Set DAB config based on branch 
+  
+steps:
+  # Step 1: Checkout code
+  - checkout: self
+
+  # Step 2: Copy all files to staging directory
+  - task: CopyFiles@2
+    displayName: Copy all files to staging
+    inputs:
+      SourceFolder: '$(Build.SourcesDirectory)'
+      Contents: '**'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+  # Step 3: Publish artifact
+  - task: PublishBuildArtifacts@1
+    displayName: Publish Build Artifact
+    inputs:
+      pathToPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'drop'
+      publishLocation: 'Container'
